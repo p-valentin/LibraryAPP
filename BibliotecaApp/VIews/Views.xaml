@@ -1,0 +1,277 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:BibliotecaApp.ViewModels"
+    xmlns:conv="clr-namespace:BibliotecaApp.Converters">
+
+    <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+        <ScrollViewer Background="#1E2A38" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="32">
+                <TextBlock Text="Welcome Back" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0 0 0 4"/>
+                <TextBlock Text="Library Overview" Foreground="#90A4AE" FontSize="13" Margin="0 0 0 32"/>
+
+                <UniformGrid Columns="4">
+                    <Border Background="#263238" CornerRadius="8" Padding="20" Margin="0 0 16 16">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Stats.BookCount}" FontSize="30" FontWeight="Bold" Foreground="#64B5F6" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Total Books" Foreground="#90A4AE" HorizontalAlignment="Center" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#263238" CornerRadius="8" Padding="20" Margin="0 0 16 16">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Stats.AvailableCount}" FontSize="30" FontWeight="Bold" Foreground="#66BB6A" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Available" Foreground="#90A4AE" HorizontalAlignment="Center" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#263238" CornerRadius="8" Padding="20" Margin="0 0 16 16">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Stats.ActiveUsers}" FontSize="30" FontWeight="Bold" Foreground="#CE93D8" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Active Readers" Foreground="#90A4AE" HorizontalAlignment="Center" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#263238" CornerRadius="8" Padding="20" Margin="0 0 0 16">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Stats.OverdueLoans}" FontSize="30" FontWeight="Bold" Foreground="#EF5350" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Overdue" Foreground="#90A4AE" HorizontalAlignment="Center" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <TextBlock Text="Activity Summary" Foreground="White" FontSize="18" FontWeight="Bold" Margin="0 24 0 16"/>
+                <UniformGrid Columns="2">
+                    <Border Background="#1A2535" CornerRadius="8" Padding="24" Margin="0 0 8 0">
+                        <StackPanel>
+                            <TextBlock Text="Loans this Month" Foreground="#90A4AE" Margin="0 0 0 12"/>
+                            <TextBlock Text="{Binding Stats.MonthlyLoans}" FontSize="42" FontWeight="Light" Foreground="White"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#1A2535" CornerRadius="8" Padding="24" Margin="8 0 0 0">
+                        <StackPanel>
+                            <TextBlock Text="Pending Fines" Foreground="#90A4AE" Margin="0 0 0 12"/>
+                            <TextBlock Text="{Binding Stats.UnpaidFees}" FontSize="42" FontWeight="Light" Foreground="White"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <TextBlock Text="Active Notifications" Foreground="White" FontSize="18" FontWeight="Bold" Margin="0 24 0 16"/>
+                <ItemsControl ItemsSource="{Binding Notifications}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#263238" BorderBrush="#EF5350" BorderThickness="2 0 0 0" Padding="16 12" Margin="0 0 0 8" CornerRadius="2">
+                                <DockPanel>
+                                    <TextBlock Text="⚠" Foreground="#EF5350" FontWeight="Bold" Margin="0 0 12 0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Message}" Foreground="#ECEFF1" VerticalAlignment="Center"/>
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding DaysOverdue, StringFormat={}({0} days overdue)}" Foreground="#90A4AE" VerticalAlignment="Center" FontSize="11"/>
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:BooksViewModel}">
+        <Grid Background="#1E2A38">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Padding="28 16 28 14" BorderBrush="#2D3A4A" BorderThickness="0 0 0 1">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Inventory" FontSize="22" FontWeight="Bold" Foreground="#ECEFF1" VerticalAlignment="Center"/>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Borrow" Command="{Binding BorrowCommand}" Style="{StaticResource SuccessButton}" Height="32" Padding="12 0" Margin="0 0 8 0" IsEnabled="{Binding Selected, Converter={StaticResource NullToBool}}"/>
+                        <Button Content="+ New Book" Command="{Binding AddCommand}" Style="{StaticResource PrimaryButton}" Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}" Height="32" Padding="12 0" Margin="0 0 8 0"/>
+                        <Button Content="Edit" Command="{Binding EditCommand}" Style="{StaticResource SecondaryButton}" Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}" Height="32" Padding="12 0" Margin="0 0 8 0" IsEnabled="{Binding Selected, Converter={StaticResource NullToBool}}"/>
+                        <Button Content="Remove" Command="{Binding DeleteCommand}" Style="{StaticResource DangerButton}" Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}" Height="32" Padding="12 0" IsEnabled="{Binding Selected, Converter={StaticResource NullToBool}}"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Row="1" Background="#1A2535" Padding="28 10">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Search:" Foreground="#90A4AE" VerticalAlignment="Center" Margin="0 0 12 0"/>
+                    <TextBox Width="150" Text="{Binding FilterTitle, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputStyle}" Tag="Search title..."/>
+                    <TextBox Width="120" Text="{Binding FilterAuthor, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputStyle}" Margin="8 0" Tag="Author..."/>
+                    <TextBox Width="120" Text="{Binding FilterCategory, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputStyle}" Tag="Category..."/>
+                    <TextBox Width="120" Text="{Binding FilterPublisher, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputStyle}" Margin="8 0" Tag="Publisher..."/>
+                    <CheckBox Content="Available" IsChecked="{Binding OnlyAvailable}" VerticalAlignment="Center" Margin="8 0"/>
+                </StackPanel>
+            </Border>
+
+            <DataGrid Grid.Row="2" ItemsSource="{Binding Books}" SelectedItem="{Binding Selected, Mode=TwoWay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Title"      Binding="{Binding Title}" Width="*"/>
+                    <DataGridTextColumn Header="Author"     Binding="{Binding Author.Name}" Width="160"/>
+                    <DataGridTextColumn Header="Category"   Binding="{Binding Category}" Width="110"/>
+                    <DataGridTextColumn Header="Publisher"  Binding="{Binding Publisher}" Width="110"/>
+                    <DataGridTextColumn Header="Stock"      Binding="{Binding AvailableCopies}" Width="60"/>
+                    <DataGridTemplateColumn Header="Status" Width="90">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Status}" Foreground="{Binding Status, Converter={StaticResource BookStatusBrush}}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8 0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:LoansViewModel}">
+        <Grid Background="#1E2A38">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Padding="28 16 28 14" BorderBrush="#2D3A4A" BorderThickness="0 0 0 1">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Borrowing History" FontSize="22" FontWeight="Bold" Foreground="#ECEFF1" VerticalAlignment="Center"/>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Issue Fine" Command="{Binding FineCommand}" Style="{StaticResource DangerButton}" Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}" Height="32" Padding="12 0" Margin="0 0 8 0" IsEnabled="{Binding Selected, Converter={StaticResource NullToBool}}"/>
+                        <Button Content="+ New Loan" Command="{Binding NewLoanCommand}" Style="{StaticResource SuccessButton}" Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}" Height="32" Padding="12 0" Margin="0 0 8 0"/>
+                        <Button Content="Return Book" Command="{Binding ReturnLoanCommand}" Style="{StaticResource SecondaryButton}" Height="32" Padding="12 0" IsEnabled="{Binding Selected, Converter={StaticResource NullToBool}}"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Loans}" SelectedItem="{Binding Selected, Mode=TwoWay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Reader"    Binding="{Binding User.FullName}" Width="160"/>
+                    <DataGridTextColumn Header="Book"      Binding="{Binding Book.Title}" Width="*"/>
+                    <DataGridTextColumn Header="Borrowed"  Binding="{Binding BorrowedAt, StringFormat=\{0:dd.MM.yyyy\}}" Width="100"/>
+                    <DataGridTextColumn Header="Due Date"  Binding="{Binding DueDate, StringFormat=\{0:dd.MM.yyyy\}}" Width="100"/>
+                    <DataGridTemplateColumn Header="Status" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Status}" Foreground="{Binding Status, Converter={StaticResource LoanStatusBrush}}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8 0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:UsersViewModel}">
+        <Grid Background="#1E2A38">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Padding="28 16 28 14" BorderBrush="#2D3A4A" BorderThickness="0 0 0 1">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Accounts" FontSize="22" FontWeight="Bold" Foreground="#ECEFF1" VerticalAlignment="Center"/>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="+ New Account" Command="{Binding AddCommand}" Style="{StaticResource PrimaryButton}" Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}" Height="32" Padding="12 0" Margin="0 0 8 0"/>
+                        <Button Content="Edit" Command="{Binding EditCommand}" Style="{StaticResource SecondaryButton}" Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}" Height="32" Padding="12 0" Margin="0 0 8 0" IsEnabled="{Binding Selected, Converter={StaticResource NullToBool}}"/>
+                        <Button Content="Suspend" Command="{Binding SuspendCommand}" Style="{StaticResource DangerButton}" Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}" Height="32" Padding="12 0" IsEnabled="{Binding Selected, Converter={StaticResource NullToBool}}"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Users}" SelectedItem="{Binding Selected, Mode=TwoWay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name"       Binding="{Binding FullName}" Width="*"/>
+                    <DataGridTextColumn Header="Email"      Binding="{Binding Email}" Width="200"/>
+                    <DataGridTextColumn Header="Role"       Binding="{Binding Role}" Width="100"/>
+                    <DataGridTextColumn Header="Joined"     Binding="{Binding RegisteredAt, StringFormat=\{0:dd.MM.yyyy\}}" Width="100"/>
+                    <DataGridTemplateColumn Header="Status" Width="90">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock VerticalAlignment="Center" Margin="8 0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="Suspended"/>
+                                            <Setter Property="Foreground" Value="#EF5350"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                    <Setter Property="Text" Value="Active"/>
+                                                    <Setter Property="Foreground" Value="#66BB6A"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PenaltiesViewModel}">
+        <Grid Background="#1E2A38">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Padding="28 16 28 14" BorderBrush="#2D3A4A" BorderThickness="0 0 0 1">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Pending Fines" FontSize="22" FontWeight="Bold" Foreground="#ECEFF1" VerticalAlignment="Center"/>
+                    <Button DockPanel.Dock="Right" Content="Pay Fine" Command="{Binding ResolveCommand}" Style="{StaticResource SuccessButton}" Height="32" Padding="12 0" IsEnabled="{Binding Selected, Converter={StaticResource NullToBool}}"/>
+                </DockPanel>
+            </Border>
+
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Penalties}" SelectedItem="{Binding Selected, Mode=TwoWay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Reader"    Binding="{Binding Loan.User.FullName}" Width="160"/>
+                    <DataGridTextColumn Header="Book"      Binding="{Binding Loan.Book.Title}" Width="*"/>
+                    <DataGridTextColumn Header="Amount"    Binding="{Binding TotalAmount, StringFormat=\{0:N2\} USD}" Width="100"/>
+                    <DataGridTemplateColumn Header="Paid"  Width="90">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="Unpaid" Foreground="#EF5350" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8 0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsPaid}" Value="True">
+                                                    <Setter Property="Text" Value="Paid"/>
+                                                    <Setter Property="Foreground" Value="#66BB6A"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:AuditViewModel}">
+        <Grid Background="#1E2A38">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Padding="28 16 28 14" BorderBrush="#2D3A4A" BorderThickness="0 0 0 1">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="System Logs" FontSize="22" FontWeight="Bold" Foreground="#ECEFF1" VerticalAlignment="Center"/>
+                    <Button DockPanel.Dock="Right" Content="Refresh" Command="{Binding RefreshCommand}" Style="{StaticResource SecondaryButton}" Height="32" Padding="12 0"/>
+                </DockPanel>
+            </Border>
+
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Logs}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Time"      Binding="{Binding Timestamp, StringFormat=\{0:HH:mm:ss\}}" Width="80"/>
+                    <DataGridTextColumn Header="Action"    Binding="{Binding Action}" Width="80"/>
+                    <DataGridTextColumn Header="Entity"    Binding="{Binding EntityName}" Width="100"/>
+                    <DataGridTextColumn Header="Details"   Binding="{Binding Description}" Width="*"/>
+                    <DataGridTextColumn Header="User"      Binding="{Binding User.FullName}" Width="140"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DataTemplate>
+
+</ResourceDictionary>

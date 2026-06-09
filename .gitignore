@@ -1,0 +1,27 @@
+# Build output
+bin/
+obj/
+
+# User-specific Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# SQLite database (runtime data, not source)
+*.db
+*.db-shm
+*.db-wal
+
+# Rider / JetBrains
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Obsolete draft files (kept locally, not part of the project)
+BibliotecaApp/Data/HashHelper.cs
+BibliotecaApp/Data/LibraryContext.cs
+BibliotecaApp/VIews/Styles.xaml
